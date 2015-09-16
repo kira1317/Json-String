@@ -1,70 +1,110 @@
 package service;
 
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Scanner;
 
 /**
  * Created by Администратор on 14.09.15.
  */
-public class Json{
+public class Json implements Serializable {
 
-  private final StringBuilder stringJson=new StringBuilder();
-  private final static String CSV_SEPARATOR = ";";
+  private StringBuilder stringJson=new StringBuilder();
+  private final static String CSV_SEPARATOR = ",";
 
-  private String toJson(Object o){
+  private final static String baseFile = "JsonFormat.json";
+
+
+  public void toJson(String json, Object o) throws IOException {
 
 
     Field[] fields = o.getClass().getDeclaredFields();
+    String[] stringData = json.split(CSV_SEPARATOR);
 
-    stringJson.append("{\n");
+    stringJson.append("{");
+    int i=0;
     for (Field field : fields)
     {
 
 
-      stringJson.append('"').append(field.getName().toString()).append('"')
-            .append(":").append('"').append(CSV_SEPARATOR)
-            .append('"').append(",").append("\n");
+        stringJson.append('"').append(field.getName().toString()).append('"')
+                .append(":").append('"').append(stringData[i])
+                .append('"').append(CSV_SEPARATOR);
+
+      i++;
     }
-      stringJson.append("}"
-      );
+    stringJson.deleteCharAt(stringJson.length()-1);
+    stringJson.append("}");
 
 
-    Annotation[] annotations=o.getClass().getAnnotations();
-    for (Annotation annotation:annotations){
 
-      System.out.println(annotation.toString()+"\n");
+    // Annotation[] annotations=o.getClass().getAnnotations();
+    //for (Annotation annotation:annotations){
 
-    }
+   //   System.out.println(annotation.toString()+"\n");
+
+    //}
+
+   /* ObjectMapper mapper = new ObjectMapper();
+    mapper.writeValue(new File(baseFile), o);*/
+
+    File file=new File(baseFile);
+    FileWriter fileWriter=new FileWriter(file);
+    fileWriter.write(stringJson.toString());
+    fileWriter.flush();
+    fileWriter.close();
 
 
-    return stringJson.toString();
-  }
-  public void fromJson(String json, Object o){
-
-
-    String[] stringData = json.split(CSV_SEPARATOR);
-
-    String[] fieldClass = toJson(o).split(CSV_SEPARATOR);
-
-
-    if(stringData.length==fieldClass.length-1){
-
-    StringBuilder stringBuilder=new StringBuilder();
-
-    for(int i=0; i<fieldClass.length-1;i++){
-
-      stringBuilder.append(fieldClass[i]).append(stringData[i]);
-
-    }
-    stringBuilder.append(fieldClass[fieldClass.length-1]);
-
-    System.out.println(stringBuilder);
-  }
-    else{
-      System.out.println("ERROR");
-    }
+    System.out.println("json created!");
 
   }
+
+
+
+  public void fromJson(Object o) throws FileNotFoundException {
+
+   // ObjectMapper mapper = new ObjectMapper();
+   // return mapper.readValue(new File(baseFile), Object.class);
+
+    FileReader fileReader = new FileReader(baseFile);
+    BufferedReader bufferedReader = new BufferedReader(fileReader);
+    Scanner scanner = new Scanner(bufferedReader);
+
+    String json=scanner.nextLine();
+
+  /*  String[]fieldAndData= json.split(CSV_SEPARATOR);
+
+    fieldAndData[0].split(":");
+    fieldAndData[1].split(":");
+    fieldAndData[2].split(":");
+    fieldAndData[3].split(":");
+
+    Field[] fields = o.getClass().getDeclaredFields();
+    int i=0;
+    for (Field field : fields)
+    {
+
+
+      if(field.getName().equals(fieldAndData[i].split(":"))){
+
+
+
+
+      }
+
+
+    }*/
+
+
+
+    System.out.printf(json);
+
+
+  }
+
+
+
 
 
 }

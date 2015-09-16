@@ -1,29 +1,28 @@
 import service.Human;
 import service.Json;
 
+import java.io.IOException;
+import java.util.Calendar;
+
 /**
  * Created by Администратор on 14.09.15.
  */
 public class App {
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
 
+        Calendar calendar=Calendar.getInstance();
+        calendar.set(1988, 3, 13);
 
+        Human human=new Human("Lena","Smile","Java",calendar);
 
-        Human human=new Human();
         Json json=new Json();
+        try {
+            json.toJson(human.toString(), human);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        StringBuilder string= new StringBuilder();
-        string.append("Lena").append(";")
-                .append("Smile").append(";")
-                .append("Java").append(";")
-                 .append("13.03.1988");
-
-
-        json.fromJson(string.toString(),human);
-
-
-
-
+        json.fromJson(human);
 
     }
 
